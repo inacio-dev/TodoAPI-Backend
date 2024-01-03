@@ -30,6 +30,12 @@ Content-Type: application/json
 @access-token = {{TodoAPIAuth.response.body.$.access}}
 
 
+### Check User
+GET http://0.0.0.0:8000/api/accounts/check/
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+
 ### Create Task
 POST http://0.0.0.0:8000/api/tasks/
 Content-Type: application/json

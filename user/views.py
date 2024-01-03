@@ -20,11 +20,31 @@ from user.models import Account
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
 from rest_framework.decorators import authentication_classes, permission_classes
+from tasks.utils import get_user_from_token
+
+
+class AccountCheckView(GenericSimpleApiView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, format=None):
+
+        try:
+            access_token = self.request.META.get('HTTP_AUTHORIZATION', '').split(' ')[1]
+            user = get_user_from_token(access_token)
+
+            account = Account.objects.get(email=user.email)
+            body = AccountDetailsSerializer(account)
+
+            return JsonResponse(data=body.data, status=status.HTTP_200_OK)
+
+        except Account.DoesNotExist:
+            return JsonResponse(data={}, status=status.HTTP_404)
 
 
 @authentication_classes([])
 @permission_classes([])
-class AccountView(GenericSimpleApiView):
+class AccountView(GenericSimpleApiView):        
+
     def post(self, request, format=None):
 
         req = AccountCreateSerializer(data=request.data)
