@@ -1,6 +1,5 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
-from django.utils import timezone
 
 class MyAccountManager(BaseUserManager):
     def create_user(self, email, name, surname, password=None):
@@ -65,3 +64,6 @@ class Account(AbstractBaseUser):
 
     def has_perm(self, perm, obj=None):
         return self.is_admin
+    
+    def has_module_perms(self, app_Label):
+        return True

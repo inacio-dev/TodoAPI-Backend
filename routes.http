@@ -1,0 +1,63 @@
+### Variables
+@access-token = ""
+@refresh-token = ""
+
+
+### Create User
+POST http://0.0.0.0:8000/api/accounts/
+Content-Type: application/json
+
+{
+    "email": "marina@gmail.com",
+    "name": "marina",
+    "surname": "rios",
+    "password": "marina",
+    "rpassword": "marina"
+}
+
+
+### Login User
+# @name TodoAPIAuth
+POST http://0.0.0.0:8000/api/token/
+Content-Type: application/json
+
+{
+    "email": "marina@gmail.com",
+    "password": "marina"
+}
+
+#### Variable Response
+@access-token = {{TodoAPIAuth.response.body.$.access}}
+
+
+### Create Task
+POST http://0.0.0.0:8000/api/tasks/
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+{
+    "title": "Tarefa Teste",
+    "description": "Essa será a descrição"
+}
+
+
+### List Tasks
+GET http://0.0.0.0:8000/api/tasks/
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+
+### Delete Task
+DELETE http://0.0.0.0:8000/api/tasks/7/
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+
+### Delete Task
+PATCH http://0.0.0.0:8000/api/tasks/6/
+Content-Type: application/json
+Authorization: Bearer {{access-token}}
+
+{
+    "completed": true
+}
