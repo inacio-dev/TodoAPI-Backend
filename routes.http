@@ -59,7 +59,7 @@ Content-Type: application/json
 Authorization: Bearer {{access-token}}
 
 
-### Delete Task
+### Update Task
 PATCH http://0.0.0.0:8000/api/tasks/6/
 Content-Type: application/json
 Authorization: Bearer {{access-token}}
