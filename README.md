@@ -5,7 +5,7 @@ This repository contains the implementation of a Todo API using Django with Pyth
 ## Table of contents
 
 - [Technologies Used](#technologies-used)
-- [Deploy on Heroku](#deploy-on-vercel)
+- [Deploy on Heroku](#deploy-on-heroku)
 - [Getting Started](#getting-started)
 - [Project Structure](#project-structure)
 - [Postman Collection](#postman-collection)
