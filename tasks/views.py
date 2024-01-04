@@ -69,7 +69,7 @@ class TaskDataProcessView(APIView):
 
         df['user'] = user.id
 
-        for row in df.iterrows():
+        for index, row in df.iterrows():
             task_serializer = TaskSerializer(data=row.to_dict())
             if task_serializer.is_valid():
                 task_serializer.save()
