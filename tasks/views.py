@@ -90,7 +90,7 @@ class TaskListCreateView(generics.ListCreateAPIView):
     def list(self, request, *args, **kwargs):
         access_token = self.request.META.get('HTTP_AUTHORIZATION', '').split(' ')[1]
         user = get_user_from_token(access_token)
-        queryset = self.get_queryset().filter(user=user)
+        queryset = self.get_queryset().filter(user=user).order_by('id')
         serializer = self.serializer_class(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
