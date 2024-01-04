@@ -4,10 +4,14 @@ from rest_framework.parsers import MultiPartParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.views import APIView
 from .models import Task
-from django.http import HttpResponse
+from django.http import HttpResponse, StreamingHttpResponse
 from .serializers import TaskSerializer
 from .utils import get_user_from_token
 import pandas as pd
+from io import BytesIO
+import xlsxwriter
+import base64
+from django.utils.encoding import smart_str
 
 
 class TaskDataProcessView(APIView):
@@ -20,10 +24,28 @@ class TaskDataProcessView(APIView):
         tasks = Task.objects.filter(user=user)
         serializer = TaskSerializer(tasks, many=True)
 
-        df = pd.DataFrame(serializer.data)
-        response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+        data = serializer.data
+
+        output = BytesIO()
+
+        workbook = xlsxwriter.Workbook(output)
+        worksheet = workbook.add_worksheet()
+
+        for row, item in enumerate(data):
+            worksheet.write(row, 0, item['title'])
+            worksheet.write(row, 1, item['description'])
+            worksheet.write(row, 2, item['completed'])
+
+        workbook.close()
+        output.seek(0)
+
+        base64_encoded = base64.b64encode(output.getvalue()).decode()
+            
+        response = StreamingHttpResponse(
+            smart_str(base64_encoded),
+            content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        )
         response['Content-Disposition'] = 'attachment; filename="tasks.xlsx"'
-        df.to_excel(response, index=False)
 
         return response
 
@@ -41,13 +63,13 @@ class TaskDataProcessView(APIView):
             if file.name.endswith('.csv'):
                 df = pd.read_csv(file)
             else:
-                df = pd.read_excel(file)
+                df = pd.read_excel(file, header=None, names=['title', 'description', 'completed'])
         except pd.errors.ParserError:
             return Response({'error': 'Falha ao ler o arquivo'}, status=status.HTTP_400_BAD_REQUEST)
 
-        df['user'] = user.id  # Adiciona o usuário à informação da tarefa
+        df['user'] = user.id
 
-        for index, row in df.iterrows():
+        for row in df.iterrows():
             task_serializer = TaskSerializer(data=row.to_dict())
             if task_serializer.is_valid():
                 task_serializer.save()
